@@ -228,24 +228,40 @@ class SimuladorViento(Simulador):
 # ======================
 # Clase Simulador con Tormenta
 # ======================
+# ======================
+# Clase Simulador con Tormenta
+# ======================
 class SimuladorTormenta(Simulador):
-    def __init__(self, seed=42, t_inicio=600, duracion=30):
-        super().__init__(seed)
+    def __init__(self, *, seed=42, t_inicio=600, duracion=30):
+        super().__init__(seed=seed)
         self.t_inicio = t_inicio
         self.t_fin = t_inicio + duracion
 
+    def actualizar_estados(self, minuto: int):
+        """Igual que Simulador, pero mantiene congestión"""
+        activos = [a for a in self.aviones.values() if a.estado not in ("ATERRIZADO", "DESVIADO")]
+        activos.sort(key=lambda av: av.distancia)
+
+        for i, avion in enumerate(activos):
+            if avion.estado.startswith("REGRESANDO"):
+                self.controlar_regreso(avion, activos)
+            else:
+                lider = activos[i-1] if i > 0 and not activos[i-1].estado.startswith("REGRESANDO") else None
+                avion.controlar_aproximacion(lider)
+
     def gestionar_finalizados(self, minuto: int, tiempo_ideal=23.4):
+        """Si la tormenta está activa, no permite aterrizar."""
         for avion in self.aviones.values():
             if avion.estado in ("ATERRIZADO", "DESVIADO"):
                 continue
 
             if avion.distancia <= 0:
-                # Caso 1: tormenta activa → no se permite aterrizar
-                if self.t_inicio <= minuto <= self.t_fin:
+                # Caso 1: aeropuerto cerrado → aborta
+                if self.t_inicio <= minuto < self.t_fin:
                     avion.estado = "REGRESANDO_TORMENTA"
-                    avion.velocidad = 200
-                    avion.distancia = 5
-                    print(f" ⛈️ Avión {avion.id} aborta aterrizaje por tormenta (t={minuto}).")
+                    avion.velocidad = 200  # nudos
+                    avion.distancia = 5    # reinsertado a 5 mn
+                    # print(f"⛈️ Avión {avion.id} aborta aterrizaje por tormenta (t={minuto}).")
                 else:
                     # Caso 2: aeropuerto abierto → aterriza normal
                     avion.estado = "ATERRIZADO"
@@ -255,13 +271,12 @@ class SimuladorTormenta(Simulador):
                     self.finalizados.append(avion)
 
     def mover_aviones(self):
-        """Extiende la lógica para manejar REGRESANDO_TORMENTA."""
+        """Mueve también los que regresan por tormenta."""
         for avion in self.aviones.values():
             if avion.estado in ("ATERRIZADO", "DESVIADO"):
                 continue
             delta = avion.velocidad / 60.0
-            if avion.estado in ("REGRESANDO", "REGRESANDO_VIENTO", "REGRESANDO_TORMENTA"):
+            if avion.estado.startswith("REGRESANDO"):
                 avion.distancia += delta
             else:
                 avion.distancia -= delta
-
