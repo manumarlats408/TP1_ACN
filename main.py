@@ -1,5 +1,9 @@
 import numpy as np
 from typing import List
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 # ======================
 # Parámetros globales
@@ -228,9 +232,6 @@ class SimuladorViento(Simulador):
 # ======================
 # Clase Simulador con Tormenta
 # ======================
-# ======================
-# Clase Simulador con Tormenta
-# ======================
 class SimuladorTormenta(Simulador):
     def __init__(self, *, seed=42, t_inicio=600, duracion=30):
         super().__init__(seed=seed)
@@ -280,3 +281,47 @@ class SimuladorTormenta(Simulador):
                 avion.distancia += delta
             else:
                 avion.distancia -= delta
+
+
+# ======================
+# Video de una simulación
+# ======================
+def animate_simulation(aviones): #pasar como parametro una salida de simular_trayectorias
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.set_xlabel("Tiempo [min]")
+    ax.set_ylabel("Distancia a pista [mn]")
+    ax.set_ylim(0, 100)   # 0 abajo (pista), 100 arriba (radar)
+    ax.grid(True, linestyle="--", alpha=0.6)
+
+    tiempo_max = max(a.historial_de_tiempos[-1] for a in aviones)
+    ax.set_xlim(0, tiempo_max)
+
+    scatters = []
+    for _ in aviones:
+        sc = ax.plot([], [], "o", ms=6)[0]
+        scatters.append(sc)
+
+    def update(frame):
+        for i, avion in enumerate(aviones):
+            t_arr = np.array(avion.historial_de_tiempos)
+            d_arr = np.array(avion.historial_de_distancias)
+
+            if frame >= t_arr[0] and frame <= t_arr[-1]:
+                x = frame  # eje X = tiempo real
+                y = np.interp(frame, t_arr, d_arr)  # distancia a la pista
+                scatters[i].set_data([x], [y])
+            else:
+                scatters[i].set_data([], [])
+        return scatters
+
+    anim = FuncAnimation(
+        fig, update,
+        frames=np.arange(0, tiempo_max+1, 1),
+        interval=100,
+        blit=False
+    )
+
+    writer = FFMpegWriter(fps=20, metadata=dict(artist='Simulación AEP'))
+    anim.save("simulacion_aep.mp4", writer=writer)
+    plt.close(fig)
+    return 
