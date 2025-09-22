@@ -286,7 +286,7 @@ class SimuladorTormenta(Simulador):
 # ======================
 # Video de una simulación
 # ======================
-def animate_simulation(aviones): #pasar como parametro una salida de simular_trayectorias
+def animate_simulation(aviones, titulo_video): #pasar como parametro una salida de simular_trayectorias
     fig, ax = plt.subplots(figsize=(10,6))
     ax.set_xlabel("Tiempo [min]")
     ax.set_ylabel("Distancia a pista [mn]")
@@ -322,6 +322,6 @@ def animate_simulation(aviones): #pasar como parametro una salida de simular_tra
     )
 
     writer = FFMpegWriter(fps=20, metadata=dict(artist='Simulación AEP'))
-    anim.save("simulacion_aep.mp4", writer=writer)
+    anim.save(f"{titulo_video}.mp4", writer=writer)
     plt.close(fig)
     return 
