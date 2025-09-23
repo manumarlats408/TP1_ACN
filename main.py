@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Dict
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 from dataclasses import dataclass, field
 
 # Parámetros globales
