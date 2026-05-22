@@ -24,3 +24,7 @@ See `congestion_simulation_demo.mp4`.
 - Congestion analysis under different traffic conditions
 - Queue growth and delay metrics
 - Operational performance evaluation through Monte Carlo simulations
+
+## Simulation Results
+
+![Simulation Results](assets/simulation_results.png)
