@@ -1,17 +1,26 @@
 # Airport Operations Simulation
 
-Discrete-event simulation of airport arrivals, landing queues, congestion and disruption scenarios.
+Discrete-event simulation of airport operations, landing queues, congestion scenarios and operational disruptions using Python and Monte Carlo methods.
 
 ## Features
+
 - Aircraft arrival simulation
-- Landing queue and separation rules
+- Landing queue and runway separation rules
 - Congestion and delay analysis
 - Wind and storm disruption scenarios
 - Monte Carlo experiments
-- Animated congestion demo
+- Animated congestion simulation
 
-## Tech Stack
-Python · NumPy · Matplotlib · Jupyter Notebook · Monte Carlo Simulation
+## Technologies
 
-## Demo
+Python · NumPy · Matplotlib · Jupyter Notebook · Monte Carlo Simulation · Queueing Theory
+
+## Simulation Demo
+
 See `congestion_simulation_demo.mp4`.
+
+## Results
+
+- Congestion analysis under different traffic conditions
+- Queue growth and delay metrics
+- Operational performance evaluation through Monte Carlo simulations
